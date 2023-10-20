@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Oct 19, 2023 at 06:43 PM
+-- Generation Time: Oct 20, 2023 at 12:58 PM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.2.4
 
@@ -33,6 +33,15 @@ CREATE TABLE `logs` (
   `log_message` text DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `logs`
+--
+
+INSERT INTO `logs` (`log_id`, `log_timestamp`, `log_message`) VALUES
+(1, '2023-10-20 09:02:38', 'user password changed'),
+(2, '2023-10-20 09:03:02', 'user deactivated'),
+(3, '2023-10-18 09:03:34', 'user tried to login account. invalid password');
+
 -- --------------------------------------------------------
 
 --
@@ -60,7 +69,7 @@ CREATE TABLE `password_policy` (
 --
 
 INSERT INTO `password_policy` (`id`, `min_length`, `max_length`, `require_upper_case`, `require_lower_case`, `require_digit`, `require_special_char`, `allowed_special_chars`, `history_count`, `expiration_days`, `lockout_attempts`, `lockout_duration_minutes`, `is_active`) VALUES
-(1, 6, 15, b'1', b'1', b'1', b'1', '1', NULL, 60, 3, 5, b'1');
+(1, 6, 15, b'1', b'1', b'1', b'1', '@', 2, 60, 3, 5, b'1');
 
 -- --------------------------------------------------------
 
@@ -126,7 +135,7 @@ CREATE TABLE `users` (
   `failed_login_attempts` int(1) NOT NULL,
   `is_locked` bit(1) NOT NULL,
   `password_changed_date` date DEFAULT NULL,
-  `lockout_timestamp` date DEFAULT NULL
+  `lockout_timestamp` time DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -134,9 +143,9 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `f_name`, `l_name`, `email`, `username`, `password`, `account_status`, `email_verification`, `created_date`, `role_id`, `failed_login_attempts`, `is_locked`, `password_changed_date`, `lockout_timestamp`) VALUES
-(0, '', '', '', 'new_admin', '$2y$10$R7OG4o2aqCXxB.tIqsQ/k.EoFHOGypHVO4CuC1D1NwCvTSzvm2ZZO', '', '', '2023-10-19', 1, 0, b'0', '2023-02-19', NULL),
+(0, 'rasindu', 'lakkitha', 'test@gmail.com', 'new_admin', '$2y$10$pqmoNdLp1p75O1EpSlA/BOxZ2ypxFu5yvLbbMGcvxHYi3NIcoHG4S', 'active', 'verified', '2023-10-19', 1, 0, b'1', '2023-10-20', '00:00:00'),
 (1, 'Dakshina11', 'Dissanayake', 'dakshina321@gmail.com', 'admin123', '$2y$10$h/bniMktniKl0rK4B9iRP.7Js8CRPXTvO2aifFcweMH78NSDP15HK', 'requested', 'notverified', '2023-10-16', 1, 3, b'0', '2023-10-19', NULL),
-(2, 'Jane', 'Smith', 'jane.smith@example.com', 'janesmith', '$3y$10$kaseDAMyDas.tzfXVks7deKapdtteBn915O6XhVv/sHbvWZ1Nt6xO', 'active', 'verified', '2023-10-16', 2, 0, b'0', '2023-10-19', NULL),
+(2, 'Jane', 'Smith', 'jane.smith@example.com', 'janesmith', '$2y$10$pqmoNdLp1p75O1EpSlA/BOxZ2ypxFu5yvLbbMGcvxHYi3NIcoHG4S', 'inactive', 'verified', '2023-10-16', 2, 0, b'0', '2023-10-19', NULL),
 (3, 'Bob', 'Johnson', 'bob.johnson@example.com', 'bobjohnson', '$4y$10$123zeDAM3erH.tzfXVks7deKapdtteBn915O6XhVv/sHbvWZ1Nt6xO', 'inactive', 'notverified', '2023-10-16', 2, 0, b'0', '2023-10-19', NULL);
 
 -- --------------------------------------------------------
@@ -214,7 +223,7 @@ ALTER TABLE `user_security_question_answers`
 -- AUTO_INCREMENT for table `logs`
 --
 ALTER TABLE `logs`
-  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `security_questions`
