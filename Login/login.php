@@ -33,7 +33,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     // Validate credentials
     if (empty($username_err) && empty($password_err)) {
-        $sql = "SELECT id, username, password, failed_login_attempts, is_locked, lockout_timestamp, password_changed_date,email_verification FROM users WHERE username = ?";
+        $sql = "SELECT id, username, password, failed_login_attempts, is_locked, lockout_timestamp, password_changed_date,email_verification,role_id,account_status FROM users WHERE username = ?";
         if ($stmt = mysqli_prepare($conn, $sql)) {
             mysqli_stmt_bind_param($stmt, "s", $param_username);
             $param_username = $username;
@@ -42,7 +42,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 mysqli_stmt_store_result($stmt);
 
                 if (mysqli_stmt_num_rows($stmt) == 1) {
-                    mysqli_stmt_bind_result($stmt, $id, $username, $hashed_password, $failed_login_attempts, $is_locked, $lockout_timestamp, $password_changed_date, $email_verified);
+                    mysqli_stmt_bind_result($stmt, $id, $username, $hashed_password, $failed_login_attempts, $is_locked, $lockout_timestamp, $password_changed_date, $email_verified, $role_id, $account_status);
 
                     if (mysqli_stmt_fetch($stmt)) {
 
@@ -59,11 +59,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             die("Error preparing the policy query: " . $conn->error);
                         }
 
-                        if ($is_locked && (time() - strtotime($lockout_timestamp)) < ($lockoutDuraion * 60)) {
-                            // Account is locked
-                            $login_err = "Your account is temporarily locked. Please try again later.";
+                        if (!isAccountAcive($account_status) && isEmailVerified($email_verified)) {
+                            $login_err = "Your account is deactivated. Please contact the administrator for assistance.";
                         } elseif (!isEmailVerified($email_verified)) {
                             $login_err = "Please verify your email to login.";
+                        } elseif ($is_locked && (time() - strtotime($lockout_timestamp)) < ($lockoutDuraion * 60)) {
+                            // Account is locked
+                            $login_err = "Your account is temporarily locked. Please try again later.";
                         } elseif (password_verify($password, $hashed_password)) {
 
                             // Prepare and execute a query to get the password expiration duration from the password policy table
@@ -107,6 +109,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                 $_SESSION["loggedin"] = true;
                                 $_SESSION["id"] = $id;
                                 $_SESSION["username"] = $username;
+                                $_SESSION["role"] = $role_id;
 
                                 // Reset failed login attempts
                                 resetFailedLoginAttempts($id);
@@ -149,6 +152,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 
     mysqli_close($conn);
+}
+
+// Function to check if the email is verified
+function isAccountAcive($account_status)
+{
+    return $account_status == "active";
 }
 
 // Function to check if the email is verified
